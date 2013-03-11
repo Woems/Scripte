@@ -23,18 +23,22 @@ do
       echo "## git gui"
       git gui
       echo "--RET: $?"
-      echo "## git pull"
-      git pull
-      echo "--RET: $?"
-      echo "## git mergetool -y"
-      git mergetool -y
-      echo "--RET: $?"
-      echo "## git commit -m 'Merge'"
-      git commit -m "Merge"
-      echo "--RET: $?"
-      echo "## git push -u origin master"
-      git push -u origin master
-      echo "--RET: $?"
+      AnzMod=$(git status | grep "modified" | grep -v "$Ignor" | wc -l)
+      echo "$AnzMod"
+      if [ $AnzMod -eq 0 ]; then
+        echo "## git pull"
+        git pull
+        echo "--RET: $?"
+        echo "## git mergetool -y"
+        git mergetool -y
+        echo "--RET: $?"
+        echo "## git commit -m 'Merge'"
+        git commit -m "Merge"
+        echo "--RET: $?"
+        echo "## git push -u origin master"
+        git push -u origin master
+        echo "--RET: $?"
+      fi
     fi
   fi
   echo "Mod: $AnzMod"
