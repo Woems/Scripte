@@ -9,8 +9,8 @@ while true
 do
   cd "$GitArchive"
   pwd
-  date
   AnzMod=$(git status | grep "modified" | grep -v "$Ignor" | wc -l)
+  echo "$(date) - Mod: $AnzMod"
   if [ $AnzMod -ge 1 ]; then
     echo "MODIFIED"
     $(sleep 1 && wmctrl -a Frage -b add,above)&
@@ -41,8 +41,8 @@ do
       fi
     fi
   fi
-  echo "Mod: $AnzMod"
-  #sleep 600
-  read -n 1 -p "Beliebige Taste zum fortfahren" -t 600
+  sleep 600
+  #read -n 1 -p "Beliebige Taste zum fortfahren" -t 600
   # sec => 1h=60*60=3600
+  #echo ""
 done
