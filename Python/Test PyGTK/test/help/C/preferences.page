@@ -1,0 +1,18 @@
+<page xmlns="http://projectmallard.org/1.0/"
+      type="topic"
+      id="preferences">
+
+<info>
+  <link type="guide" xref="index#contents"/>
+  <credit type="author">
+    <name>Woems</name>
+    <email>woems@freenet.de</email>
+    <years>2012</years>
+  </credit>
+  <desc>Testfile</desc>
+</info>
+
+<title>wPreferences</title>
+<p>Woems Preferences</p>
+
+</page>

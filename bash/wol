@@ -1,0 +1,22 @@
+#!/bin/bash
+
+function wol()
+{
+  echo "-----------------"
+  echo "Wake: $2 ($1)"
+  echo "-----------------"
+  wakeonlan "$2"
+  sleep 40
+  for i in $(seq 1 10)
+  do
+    echo -n "$i"
+    sleep 2
+    echo -n "."
+    if ping -c 1 "$1" > /dev/null; then echo "ONLINE"; return 0; fi
+  done
+  echo "OFFLINE";
+  return 1 
+}
+
+wol "10.0.0.1" "00:11:22:33:44:55"
+read -s -n 1 -t 120 -p "Beliebige Taste zum fortfahren..."
