@@ -1,7 +1,8 @@
-
 #!/bin/bash
 
 GitArchive="$HOME/.mozilla/firefox/azua9l03.default/gm_scripts"
+if [ ! -d "$GitArchive" ]; then GitArchive="$HOME/.mozilla/firefox/vkuuxfit.default/gm_scripts"; fi
+if [ ! -d "$GitArchive" ]; then echo "gm_scripts nicht gefunden"; exit; fi
 ScriptRun="./cleanup.sh"
 Ignor="config"
 
@@ -41,6 +42,7 @@ do
       fi
     fi
   fi
+  echo "Wait for 10 min... (STRG+C zum abbrechen)"
   sleep 600
   #read -n 1 -p "Beliebige Taste zum fortfahren" -t 600
   # sec => 1h=60*60=3600
