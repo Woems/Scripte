@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# screen -dmS gcr /home/woems/Scripte/bash/git-commit-reminder.sh
+
 exec 3> >(zenity --notification --listen)
 
 GitArchive="$HOME/.mozilla/firefox/azua9l03.default/gm_scripts"
