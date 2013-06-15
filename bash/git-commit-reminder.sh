@@ -44,6 +44,15 @@ function show_modified()
    git status | grep "\(modified\|Untracked\)" | grep -v "$Ignor" | wc -l
 }
 
+function sync_gedit_snippets()
+{
+  if diff ~/.gnome2/gedit/snippets/ $GitArchive/snippets/; then
+    echo "Keine Unterschiede...";
+  else
+    meld ~/.gnome2/gedit/snippets/ $GitArchive/snippets/
+  fi
+}
+
 
 exec 3> >(zenity --notification --listen)
 
@@ -68,6 +77,7 @@ do
     $(sleep 1 && wmctrl -a Frage -b add,above)&
     RET=$(zenity --question --text "$AnzMod Dateien wurden modifiziert. Commiten?")
     if [ $? -eq 0 ]; then
+      sync_gedit_snippets
       add_config_xml
       git_gui
       AnzMod=$(show_modified)
