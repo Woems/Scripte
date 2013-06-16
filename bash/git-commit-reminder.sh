@@ -1,5 +1,59 @@
 #!/bin/bash
 
+# screen -dmS gcr /home/woems/Scripte/bash/git-commit-reminder.sh
+
+function git_gui()
+{
+  echo "## git gui"
+  echo "tooltip: GCR: gui" >&3
+  git gui
+  echo "--RET: $?"
+}
+
+function git_push_pull()
+{
+  echo "## git pull"
+  echo "tooltip: GCR: pull" >&3
+  git pull
+  echo "--RET: $?"
+  echo "## git mergetool -y"
+  echo "tooltip: GCR: mergetool" >&3
+  git mergetool -y
+  echo "--RET: $?"
+  echo "## git commit -m 'Merge'"
+  echo "tooltip: GCR: commit merge" >&3
+  git commit -m "Merge"
+  echo "--RET: $?"
+  echo "## git push -u origin master"
+  echo "tooltip: GCR: push" >&3
+  git push -u origin master
+  echo "--RET: $?"
+}
+
+function add_config_xml()
+{
+  echo "tooltip: GCR: config.xml" >&3
+  if git status | grep "modified:.*config.xml" > /dev/null; then
+    xmlstarlet ed -L -d "/UserScriptConfig/Script/@installTime" -d "/UserScriptConfig/Script/@lastUpdateCheck" -d "/UserScriptConfig/Script/@modified" -d "/UserScriptConfig/Script/@uuid" config.xml
+    git add config.xml ; git commit -m "config"
+  fi
+}
+
+function show_modified()
+{
+   git status | grep "\(modified\|Untracked\)" | grep -v "$Ignor" | wc -l
+}
+
+function sync_gedit_snippets()
+{
+  if diff ~/.gnome2/gedit/snippets/ $GitArchive/snippets/; then
+    echo "Keine Unterschiede...";
+  else
+    meld ~/.gnome2/gedit/snippets/ $GitArchive/snippets/
+  fi
+}
+
+
 exec 3> >(zenity --notification --listen)
 
 GitArchive="$HOME/.mozilla/firefox/azua9l03.default/gm_scripts"
@@ -8,11 +62,14 @@ if [ ! -d "$GitArchive" ]; then echo "gm_scripts nicht gefunden"; exit; fi
 ScriptRun="./cleanup.sh"
 Ignor="config"
 
+cd "$GitArchive"
+
+git_push_pull
+
 while true
 do
-  cd "$GitArchive"
   pwd
-  AnzMod=$(git status | grep "modified" | grep -v "$Ignor" | wc -l)
+  AnzMod=$(show_modified)
   echo "$(date) - Mod: $AnzMod"
   echo "tooltip: GCR: mod: $AnzMod" >&3
   if [ $AnzMod -ge 1 ]; then
@@ -20,34 +77,13 @@ do
     $(sleep 1 && wmctrl -a Frage -b add,above)&
     RET=$(zenity --question --text "$AnzMod Dateien wurden modifiziert. Commiten?")
     if [ $? -eq 0 ]; then
-      echo "tooltip: GCR: config.xml" >&3
-      if git status | grep "modified:.*config.xml" > /dev/null; then
-        xmlstarlet ed -L -d "/UserScriptConfig/Script/@installTime" -d "/UserScriptConfig/Script/@lastUpdateCheck" -d "/UserScriptConfig/Script/@modified" -d "/UserScriptConfig/Script/@uuid" config.xml
-        git add config.xml ; git commit -m "config"
-      fi
-      echo "## git gui"
-      echo "tooltip: GCR: gui" >&3
-      git gui
-      echo "--RET: $?"
-      AnzMod=$(git status | grep "modified" | grep -v "$Ignor" | wc -l)
+      sync_gedit_snippets
+      add_config_xml
+      git_gui
+      AnzMod=$(show_modified)
       echo "$AnzMod"
       if [ $AnzMod -eq 0 ]; then
-        echo "## git pull"
-        echo "tooltip: GCR: pull" >&3
-        git pull
-        echo "--RET: $?"
-        echo "## git mergetool -y"
-        echo "tooltip: GCR: mergetool" >&3
-        git mergetool -y
-        echo "--RET: $?"
-        echo "## git commit -m 'Merge'"
-        echo "tooltip: GCR: commit merge" >&3
-        git commit -m "Merge"
-        echo "--RET: $?"
-        echo "## git push -u origin master"
-        echo "tooltip: GCR: push" >&3
-        git push -u origin master
-        echo "--RET: $?"
+        git_push_pull
       fi
     fi
   fi
